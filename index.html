@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        .titulo{
+            text-align: center;
+        }
+        .contenedor_form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form{
+            text-align: center;
+
+        }
+
+        #fname{
+            margin: 30px;
+        }
+        #lname{
+            margin: 30px;
+        }
+
+    </style>
+    <title>Ingresar</title>
+</head>
+<body>
+<h1 class="titulo">Registro</h1>
+
+<div class="contenedor_form">
+    <form id="form">
+        <label for="nombre">Usuario</label><br>
+        <input type="text" id="nombre" name="nombre" value="John"><br>
+        <label for="contrasenia">Contraseña</label><br>
+        <input type="text" id="contrasenia" name="contrasenia" value="John"><br>
+        <label for="correo">Correo</label><br>
+        <input type="text" id="correo" name="correo" value="Doe"><br><br>
+        <input type="submit">
+    </form>
+
+</div>
+
+<script src="./front.js"></script>
+
+</body>
+</html>
