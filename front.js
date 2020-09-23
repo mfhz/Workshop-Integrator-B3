@@ -1,9 +1,16 @@
-let envio = document.querySelector('form');
-envio.addEventListener("submit", enviarDatos);
-function enviarDatos (e){
+let registrar = document.querySelector('#registro');
+// let login = document.querySelector('#login');
+const url = new URL("http://localhost:3000/");
+
+// registrar.addEventListener("submit", registrarF);
+login.addEventListener("submit", loginF);
+
+
+
+function registrarF(e){
 
     e.preventDefault();
-    let upload = new FormData(document.querySelector('#form'));
+    let upload = new FormData(document.querySelector('#registro'));
     const data = new URLSearchParams();
     for (const pair of upload) {
         data.append(pair[0], pair[1]);
@@ -12,10 +19,31 @@ function enviarDatos (e){
         method:"POST",
         body: data
     }
-    const url = new URL("http://localhost:3000");
-    fetch(`${url}usuario`, parametros)
+    
+    fetch(`${url}registro`, parametros)
 
 }
+
+
+function loginF(e){
+
+    e.preventDefault();
+    let upload = new FormData(document.querySelector('#login'));
+    const data = new URLSearchParams();
+    for (const pair of upload) {
+        data.append(pair[0], pair[1]);
+    }
+    const parametros = {
+        method:"POST",
+        body: data
+    }
+    
+    fetch(`${url}login`, parametros)
+
+}
+
+
+
 
 
 
