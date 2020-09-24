@@ -1,9 +1,8 @@
 let registrar = document.querySelector('#registro');
-// let login = document.querySelector('#login');
 const url = new URL("http://localhost:3000/");
 
-// registrar.addEventListener("submit", registrarF);
-login.addEventListener("submit", loginF);
+registrar.addEventListener("submit", registrarF);
+
 
 
 
@@ -21,26 +20,36 @@ function registrarF(e){
     }
     
     fetch(`${url}registro`, parametros)
+    .then((succes) => {
+        if (succes.ok) {
+            return succes.json();
+        } 
+    })
+    .then((data) => {
+        // console.log(data);
+        if (data.status == 200) {
+            guardarLS(data.user);
+            window.location.href='./bienvenida.html';
+        }
+    })    
 
 }
 
+function guardarLS(usuario) {
+    let datos = {
+        username: usuario.nombre,
+        edad: usuario.edad,
+        email: usuario.correo
+    };
 
-function loginF(e){
 
-    e.preventDefault();
-    let upload = new FormData(document.querySelector('#login'));
-    const data = new URLSearchParams();
-    for (const pair of upload) {
-        data.append(pair[0], pair[1]);
-    }
-    const parametros = {
-        method:"POST",
-        body: data
-    }
-    
-    fetch(`${url}login`, parametros)
 
+
+    localStorage.setItem('user', JSON.stringify(datos));
 }
+
+
+
 
 
 
