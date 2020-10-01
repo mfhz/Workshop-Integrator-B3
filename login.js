@@ -29,5 +29,23 @@ function loginF(e){
      }
      
      fetch(`${url}login`, parametros)
- 
+     .then((succes) => {
+          if (succes.ok) {
+              return succes.json();
+          } 
+      })
+      .then((data) => {
+          console.log(data);
+          if (data.status == 200) {
+              guardarLS(data.token);
+              window.location.href='./bienvenida.html';
+          }
+      }) 
+      
+
+ }
+
+ function guardarLS(usuario) {
+
+     localStorage.setItem('user', JSON.stringify(usuario));
  }

@@ -1,9 +1,12 @@
 const express = require('express');
 const server = express();
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+const api = '1234567';
 
 const helmet = require('helmet');
 server.use(helmet());
@@ -44,7 +47,7 @@ server.listen(3000, () => {
     console.log("El servidor está inicializado en el puerto 3000");
 });
 
-let usuarios = [{'nombre': 'prueba', 'correo': 'prueba@prueba.com', 'contrasenia': 'prueba123456', 'monto': 30000}];
+let usuarios = [{'nombre': 'prueba', 'correo': 'prueba@prueba.com', 'contrasenia': 'prueba123456', 'monto': 30000, 'admin': true}, {'nombre': 'juan', 'correo': 'prueba@prueba.com', 'contrasenia': 'prueba123456', 'monto': 30000}];
 
 server.get('/usuario',(req, res) => {
     if(usuarios.length == 0){
@@ -57,24 +60,31 @@ server.post('/login',(req, res) => {
     console.log('entró');
     // console.log(req.body.nombre);
     // console.log(req.body);
-    const validarUser = usuarios.findIndex(c => {
+    const validarDatos = usuarios.findIndex(c => {
         // console.log(req.body.nombre);
-        return c.nombre == req.body.nombre;
+        
+        return c.nombre == req.body.nombre && c.contrasenia == req.body.contrasenia;
     });
-    const validarPass = usuarios.findIndex(c => {
-        return c.contrasenia == req.body.contrasenia;
-    });
+    // const validarPass = usuarios.findIndex(c => {
+    //     return c.contrasenia == req.body.contrasenia;
+    // });
 
     // let x = usuarioExiste(req);
     // console.log(x);
 
-    if (validarUser >= 0 && validarPass >= 0) {
-        res.status(200).json('Ingreso Exitoso');
+    if (validarDatos >= 0) {
+        let token = jwt.sign(usuarios[validarDatos], api);
+
+        res.status(200).json({msj: "Ingreso Exitoso", token: token, status: 200});
+
+        // res.status(200).json('Ingreso Exitoso');
         console.log('Ingreso Exitoso');
     } else {
         res.status(200).json('Usuario o contraseña incorrectos');
         console.log('Usuario o contraseña incorrectos');
     }
+
+
 })
 
 server.post('/registro', limite,validarEdad,validarCorreo,(req, res) => {
@@ -96,11 +106,26 @@ server.post('/registro', limite,validarEdad,validarCorreo,(req, res) => {
             console.log('El usuario ya existe');
     } else {
         req.body.monto = 0;
+        req.body.admin = false;
+        let usuario = req.body;
+        let token = jwt.sign(usuario, api);        
         usuarios.push(req.body);
-        res.status(200).json({status: 200, user: req.body});
+        res.status(200).json({msj: "Ingreso Exitoso", token: token,status: 200});    
+        // res.status(200).json({status: 200, user: req.body});
         console.log('¡Usuario creado con éxito!');
     }
 });
+
+server.post('/validar', (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const validarToken = jwt.verify(token, api);
+
+    if (!validarToken) {
+        res.status(401).send('Token invalido');
+    } else {
+        res.status(200).json({data: validarToken, status: 200}); 
+    }
+})
 
 
 

@@ -26,9 +26,9 @@ function registrarF(e){
         } 
     })
     .then((data) => {
-        // console.log(data);
+        console.log(data);
         if (data.status == 200) {
-            guardarLS(data.user);
+            guardarLS(data.token);
             window.location.href='./bienvenida.html';
         }
     })    
@@ -36,16 +36,8 @@ function registrarF(e){
 }
 
 function guardarLS(usuario) {
-    let datos = {
-        username: usuario.nombre,
-        edad: usuario.edad,
-        email: usuario.correo
-    };
 
-
-
-
-    localStorage.setItem('user', JSON.stringify(datos));
+    localStorage.setItem('user', JSON.stringify(usuario));
 }
 
 
