@@ -26,6 +26,7 @@ function registrarF(e){
         } 
     })
     .then((data) => {
+        // console.log('DATA');
         console.log(data);
         if (data.status == 200) {
             guardarLS(data.token);

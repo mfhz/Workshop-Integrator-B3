@@ -2,6 +2,7 @@ const express = require('express');
 const server = express();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const sequelize = require('./conexion.js');
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -60,11 +61,15 @@ server.post('/login',(req, res) => {
     console.log('entró');
     // console.log(req.body.nombre);
     // console.log(req.body);
-    const validarDatos = usuarios.findIndex(c => {
-        // console.log(req.body.nombre);
+    // const validarDatos = usuarios.findIndex(c => {
+    //     // console.log(req.body.nombre);
         
-        return c.nombre == req.body.nombre && c.contrasenia == req.body.contrasenia;
-    });
+    //     return c.nombre == req.body.nombre && c.contrasenia == req.body.contrasenia;
+    // });
+
+    const validarDatos = verificarCuenta(req.body);
+    console.log(validarDatos);
+
     // const validarPass = usuarios.findIndex(c => {
     //     return c.contrasenia == req.body.contrasenia;
     // });
@@ -72,7 +77,7 @@ server.post('/login',(req, res) => {
     // let x = usuarioExiste(req);
     // console.log(x);
 
-    if (validarDatos >= 0) {
+    if (validarDatos) {
         let token = jwt.sign(usuarios[validarDatos], api);
 
         res.status(200).json({msj: "Ingreso Exitoso", token: token, status: 200});
@@ -85,16 +90,17 @@ server.post('/login',(req, res) => {
     }
 
 
+
 })
 
 server.post('/registro', limite,validarEdad,validarCorreo,(req, res) => {
     // console.log('entró');
-    console.log(req.body);
-    console.log(req.body.name);
+    // console.log(req.body.nombre);
+    // console.log(req.body.name);
     const i = usuarios.findIndex(c => {
         return c.nombre == req.body.nombre;
     });
-    console.log(i);
+    // console.log(i);
     if (!req.body.nombre || !req.body.correo || !req.body.contrasenia) {
         res.status(400).send('Todos los campos son obligatorios para registrarse');
         console.log('Todos los campos son obligatorios para registrarse');
@@ -110,9 +116,13 @@ server.post('/registro', limite,validarEdad,validarCorreo,(req, res) => {
         let usuario = req.body;
         let token = jwt.sign(usuario, api);        
         usuarios.push(req.body);
+        // console.log('Entra acá');
         res.status(200).json({msj: "Ingreso Exitoso", token: token,status: 200});    
         // res.status(200).json({status: 200, user: req.body});
+        registroBD(req.body);
         console.log('¡Usuario creado con éxito!');
+
+
     }
 });
 
@@ -143,4 +153,41 @@ server.post('/validar', (req, res) => {
         
 //     })
 // }
+
+function registroBD(req) {
+    // console.log(req);
+    let array_insert = [req.nombre, req.contrasenia, req.edad, req.correo];
+    // console.log(array_insert);
+
+    sequelize.query('INSERT INTO `usuarios` (`user`, `password`, `age`, `email`) VALUES(?, ?, ?, ?)', {replacements: array_insert, type: sequelize.QueryTypes.SELECT})
+    .then((succes) => {
+        console.log(succes);
+    })
+    .catch((err) => {
+        console.log('error----', err);
+    })
+}
+
+async function verificarCuenta(req) {
+    var x;
+    sequelize.query('SELECT user, password from usuarios', {type: sequelize.QueryTypes.SELECT})    
+    .then((succes) => {
+        // console.log(succes);
+        succes.forEach(element => {
+            // console.log(element.user);
+            if (element.user == req.nombre && element.password == req.contrasenia) {
+                // console.log('CORRECTO');
+                return true;
+
+            } else {
+                console.log('INCORRECTO');
+            }
+        });
+    })
+    .catch((err) => {
+        console.log('error----', err);
+    })
+}
+
+
 
